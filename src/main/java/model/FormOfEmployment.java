@@ -1,0 +1,8 @@
+package model;
+
+/**
+ *
+ */
+public enum FormOfEmployment {
+    FULL_TIME_EMPLOYEE, PART_TIME_EMPLOYEE, INTERN, FREELANCER, OWNER, PARTNER, BOARD_MEMBER, VOLUNTEER
+}
