@@ -20,3 +20,4 @@ public class XingProfiles implements Serializable {
         return profiles;
     }
 }
+ 

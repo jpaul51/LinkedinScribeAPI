@@ -19,7 +19,7 @@ public abstract class XingObject implements Serializable {
      */
     public Map<String, Object> getExtraData() {
         return extraData;
-    }
+     }
 
     /**
      * {@link com.fasterxml.jackson.annotation.JsonAnySetter} hook. Called when an otherwise unmapped property is being processed during JSON deserialization.

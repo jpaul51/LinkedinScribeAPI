@@ -19,16 +19,40 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyEnumerated;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Type;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Model class containing a user's Xing profile information.
  *
  * @author Johannes Buehler
  * @author Dominik Bartholdi <domi@fortysix.ch>
  */
+@Entity
+@Table(name = "XingProfile", schema="public")
 public class XingProfile implements Serializable {
 
-
+@Id
+@GeneratedValue(strategy=GenerationType.IDENTITY)
+@Column(name="profileGeneratedId")
+long idLong;
     private static final long serialVersionUID = 6579398072819111682L;
+    @Type(type="java.lang.String")
     private List<String> badges;
     private BirthDate birthDate;
     private PhotoUrls photoUrls;
@@ -40,20 +64,34 @@ public class XingProfile implements Serializable {
     private BusinessAddress businessAddress;
     private PrivateAddress privateAddress;
     private String haves;
+    @Column(name="prfileId")
     private String id;
     private String firstName;
     private String lastName;
     private String permalink;
     private String activeEmail;
     private String displayName;
+    @ManyToOne
     private TimeZone timeZone;
+    @Type(type="java.lang.String")
     private List<String> premiumServices;
     private EmploymentStatus employmentStatus;
+    @ManyToOne
     private WebProfiles webProfiles;
+    @ManyToOne
     private InstantMessagingAccounts instantMessagingAccounts;
     private ProfessionalExperience professionalExperience;
     private EducationalBackground educationalBackground;
+
+    
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @MapKeyEnumerated(value = EnumType.STRING)
     private Map<Language, LanguageSkill> languages;
+    
+    @Type(type="model.Contacts")
+    @ManyToOne(cascade=CascadeType.ALL) 
+    @JsonIgnore
     private Contacts contacts;
 
 
@@ -78,7 +116,67 @@ public class XingProfile implements Serializable {
     }
 
     
-    public Contacts getContacts() {
+    public long getIdLong() {
+		return idLong;
+	}
+
+	public void setIdLong(long idLong) {
+		this.idLong = idLong;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public TimeZone getTimeZone() {
+		return timeZone;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public void setPermalink(String permalink) {
+		this.permalink = permalink;
+	}
+
+	public void setActiveEmail(String activeEmail) {
+		this.activeEmail = activeEmail;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
+
+	public void setEmploymentStatus(EmploymentStatus employmentStatus) {
+		this.employmentStatus = employmentStatus;
+	}
+
+	public void setInstantMessagingAccounts(InstantMessagingAccounts instantMessagingAccounts) {
+		this.instantMessagingAccounts = instantMessagingAccounts;
+	}
+
+	public void setProfessionalExperience(ProfessionalExperience professionalExperience) {
+		this.professionalExperience = professionalExperience;
+	}
+
+	public void setEducationalBackground(EducationalBackground educationalBackground) {
+		this.educationalBackground = educationalBackground;
+	}
+
+	public void setLanguages(Map<Language, LanguageSkill> languages) {
+		this.languages = languages;
+	}
+
+	public Contacts getContacts() {
 		return contacts;
 	}
 
@@ -221,7 +319,7 @@ public class XingProfile implements Serializable {
     public EmploymentStatus getEmploymentStatus() {
         return employmentStatus;
     }
-
+    @Enumerated
     public Map<Language, LanguageSkill> getLanguages() {
         return languages;
     }

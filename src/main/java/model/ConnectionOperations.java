@@ -3,7 +3,7 @@ package model;
 import java.util.List;
 
 public interface ConnectionOperations {
-
+ 
     /**
      * Retrieves up to 500 of the 1st-degree connections from the current user's network.
      * @return the user's connections

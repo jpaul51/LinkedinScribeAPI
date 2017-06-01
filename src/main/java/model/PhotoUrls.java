@@ -14,7 +14,7 @@ public class PhotoUrls implements Serializable {
 
 	@Deprecated
 	private String mediumThumb;
-
+ 
 	@Deprecated
 	private String maxiThumb;
 

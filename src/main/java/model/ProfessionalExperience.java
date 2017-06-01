@@ -15,9 +15,21 @@ public class ProfessionalExperience implements Serializable {
 	private Company primaryCompany;
 	private List<Award> awards;
 
+	
+	
+	
+	
+	public ProfessionalExperience(List<Company> companies, Company primaryCompany, List<Award> awards) {
+		super();
+		this.companies = companies;
+		this.primaryCompany = primaryCompany;
+		this.awards = awards;
+	}
+
 	/**
 	 * deprecated by xing since "2014-05-08"
-	 */
+	 */ 
+	
 	@Deprecated
 	public List<Company> getNonPrimaryCompanies() {
 		return nonPrimaryCompanies;

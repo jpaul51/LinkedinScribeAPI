@@ -1,7 +1,15 @@
 package model;
 
-public class TimeZone {
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
+@Entity
+public class TimeZone {
+	
+	@GeneratedValue
+	@Id
+	long id;
     private String name;
     private Double utcOffset;
 
@@ -21,5 +29,13 @@ public class TimeZone {
     public void setUtcOffset(Double utcOffset) {
         this.utcOffset = utcOffset;
     }
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
 
 }

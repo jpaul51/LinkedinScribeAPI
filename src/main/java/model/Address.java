@@ -18,7 +18,21 @@ public class Address implements Serializable {
 
 
 
-    public Object getFax() {
+    public Address(String fax, String mobilePhone, String phone, String zipCode, String country, String province,
+			String city, String street, String email) {
+		super();
+		this.fax = fax;
+		this.mobilePhone = mobilePhone;
+		this.phone = phone;
+		this.zipCode = zipCode;
+		this.country = country;
+		this.province = province;
+		this.city = city;
+		this.street = street;
+		this.email = email;
+	}
+
+	public Object getFax() {
         return fax;
     }
 

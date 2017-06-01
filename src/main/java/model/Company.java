@@ -19,6 +19,24 @@ public class Company implements Serializable {
     private FormOfEmployment formOfEmployment;
     private Boolean untilNow;
 
+	public Company(String industry, String companySize, XingDate endDate, String tag, String name, String url,
+			CareerLevel careerLevel, String title, XingDate beginDate, String description,
+			FormOfEmployment formOfEmployment, Boolean untilNow) {
+		super();
+		this.industry = industry;
+		this.companySize = companySize;
+		this.endDate = endDate;
+		this.tag = tag;
+		this.name = name;
+		this.url = url;
+		this.careerLevel = careerLevel;
+		this.title = title;
+		this.beginDate = beginDate;
+		this.description = description;
+		this.formOfEmployment = formOfEmployment;
+		this.untilNow = untilNow;
+	}
+
 	public String getId() {
 		return id;
 	}

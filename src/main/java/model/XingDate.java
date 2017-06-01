@@ -21,7 +21,7 @@ public class XingDate implements Serializable {
 	private Integer month;
 
 	public XingDate(String dateString) {
-
+ 
 		if (dateString != null && !dateString.trim().isEmpty()) {
             dateString = dateString.trim();
             if (DEFAULT_DATE_FORMAT.length() == dateString.length()) {

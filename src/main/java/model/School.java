@@ -16,6 +16,21 @@ public class School implements Serializable {
 	private XingDate beginDate;
 	private String notes;
 
+	
+	
+	
+	public School( String subject, XingDate endDate, String degree, String name, XingDate beginDate,
+			String notes) {
+		super();
+		
+		this.subject = subject;
+		this.endDate = endDate;
+		this.degree = degree;
+		this.name = name;
+		this.beginDate = beginDate;
+		this.notes = notes;
+	}
+
 	public String getId() {
 		return id;
 	}
