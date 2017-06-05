@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,13 +43,13 @@ public class Controller {
 	 
 	@RequestMapping(value="/login",method = RequestMethod.POST)
 	@ResponseBody
-	public HashMap<String,String> login(@RequestBody LoginBody body )
+	public HashMap<String,String> login(@RequestParam String name,@RequestParam String password )
 	{
-		Admin admin = adminService.login(body.name,body.password);
+		Admin admin = adminService.login(name,password);
 		
 		if(admin==null)
 		{
-			admin = new Admin(body.name, body.password);
+			admin = new Admin(name, password);
 			adminService.addAdmin(admin);
 		}
 		
@@ -61,9 +62,9 @@ public class Controller {
 	
 	@RequestMapping(value="/favoris/get",method = RequestMethod.POST)
 	@ResponseBody
-	public List<Favoris> getFavoris(@RequestBody LoginBody body )
+	public List<Favoris> getFavoris(@RequestParam String name, @RequestParam String password )
 	{
-		Admin loggedAdmin = adminService.login(body.name, body.password);
+		Admin loggedAdmin = adminService.login(name, password);
 		if(loggedAdmin!=null)
 		{
 			return loggedAdmin.getFav();
@@ -75,10 +76,10 @@ public class Controller {
 	
 	@RequestMapping(value="/favoris/add",method = RequestMethod.POST)
 	@ResponseBody
-	public HashMap<String,String> addFavoris(@RequestBody FavorisBody body )
+	public HashMap<String,String> addFavoris(@RequestParam String name, @RequestParam String password, @RequestParam String title, @RequestParam("profile_id_list") ArrayList<String> profileIdList )
 	{
 		
-		Admin loggedAdmin = adminService.login(body.name, body.password);
+		Admin loggedAdmin = adminService.login(name, password);
 		
 		Favoris favToAdd=null;
 		
@@ -91,9 +92,9 @@ public class Controller {
 				
 				System.out.println("SIZE: "+favMap.size());
 				
-				if(favMap.contains(new Favoris(body.title)))
+				if(favMap.contains(new Favoris(title)))
 				{
-					favToAdd = favMap.get(favMap.indexOf(new Favoris(body.title)));
+					favToAdd = favMap.get(favMap.indexOf(new Favoris(title)));
 					System.out.println("Editing: "+favToAdd.getTitle()+", SIZE: "+favToAdd.getFavList().size()+", ID: "+favToAdd.getId());
 					List<XingProfile> profiles = favToAdd.getFavList();
 					
@@ -102,7 +103,7 @@ public class Controller {
 					
 					List<XingProfile> xingProfilesToAdd = new ArrayList<>();
 					
-					for(String profileIdToAdd : body.profileId)
+					for(String profileIdToAdd : profileIdList)
 					{
 						XingProfile xingProfileToAdd = xingService.findByProfileId(profileIdToAdd);
 						if(xingProfileToAdd!=null)
@@ -124,7 +125,7 @@ public class Controller {
 				{
 					
 					ArrayList<XingProfile> profiles = new ArrayList<>();
-					for(String profileId : body.profileId)
+					for(String profileId : profileIdList)
 					{
 						XingProfile profile = xingService.findByProfileId(profileId);
 						if(profile != null)
@@ -134,7 +135,7 @@ public class Controller {
 						}
 						
 					}
-					favToAdd = new Favoris(body.title, profiles);
+					favToAdd = new Favoris(title, profiles);
 					System.out.println("ADD fav: "+favToAdd.toString());
 					favMap.add(favToAdd);
 					loggedAdmin.setFav(favMap);
@@ -145,7 +146,7 @@ public class Controller {
 				favMap = new ArrayList();
 				
 				ArrayList<XingProfile> profiles = new ArrayList<>();
-				for(String profileId : body.profileId)
+				for(String profileId : profileIdList)
 				{
 					XingProfile profile = xingService.findByProfileId(profileId);
 					if(profile != null)
@@ -155,7 +156,7 @@ public class Controller {
 					
 				}
 				
-				favToAdd = new Favoris(body.title, profiles);
+				favToAdd = new Favoris(title, profiles);
 				favMap.add(favToAdd);
 				loggedAdmin.setFav(favMap);
 			}
