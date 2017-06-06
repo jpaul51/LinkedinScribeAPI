@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title> TUB API</title>
+        <title> Xing API</title>
     </head>
 
     <body>
@@ -16,7 +16,7 @@
 			<table>
 			<tr><th>URL</th><th>TYPE</th><th>PARAMETERS</th><th>RETURN</th></tr>
 			<tr><td>/login</td><td>POST</td><td>name: String<br/>admin name<br/>password:String</td><td>"success"</td></tr>
-			<tr><td>/favoris/add</td><td>POST</td><td>name: String, admin name<br/>password:String<br/>title:String, Fav list title<br/>profile_id_list:array, example:["id1","id2"]</td><td>"success"</td></tr>
+			<tr><td>/favoris/add</td><td>POST</td><td>name: String, admin name<br/>password:String<br/>title:String, Fav list title<br/>profile_id_list:array, example:["id1","id2"]</td><td>{"code":"ok"}</td></tr>
 			<tr><td>/favoris/get</td><td>POST</td><td>name: String<br/>admin name, password:String</td><td>Favoris list</td></tr>
 			<tr><td>/profiles/profile_id</td><td>GET</td><td>profile_id: String</td><td>XingProfile Object</td></tr>
 			<tr><td>/profiles/tag/profiles_tag</td><td>GET</td><td>profiles_tag: String</td><td>XingProfile Array</td></tr>

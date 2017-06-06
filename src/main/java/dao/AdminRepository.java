@@ -15,6 +15,9 @@ public interface AdminRepository extends CrudRepository<Admin, Long> {
 	public Admin login(@Param("name")String name,@Param("password")String password);
 	
 
+	@Query("Select a from Admin a where a.name=:name")
+	public Admin adminExists(@Param("name")String name);
+	
 	
 	
 }

@@ -21,6 +21,10 @@ public class AdminService {
 		return adminRepo.login(name, password);
 	}
 	
+	public boolean adminExists(String name)
+	{
+		return adminRepo.adminExists(name)!=null;
+	}
 	
 	public void addAdmin(Favoris fav,Admin a)
 	{

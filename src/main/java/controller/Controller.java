@@ -35,31 +35,34 @@ import web.LoginBody;
 public class Controller {
 
 
-	 @Autowired
-	  XingService xingService;
-	   
-	 @Autowired
-	 AdminService adminService;
-	 
+	@Autowired
+	XingService xingService;
+
+	@Autowired
+	AdminService adminService;
+
 	@RequestMapping(value="/login",method = RequestMethod.POST)
 	@ResponseBody
 	public HashMap<String,String> login(@RequestParam String name,@RequestParam String password )
 	{
 		Admin admin = adminService.login(name,password);
-		
+
 		if(admin==null)
 		{
-			admin = new Admin(name, password);
-			adminService.addAdmin(admin);
+			if(!adminService.adminExists(name))
+			{
+				admin = new Admin(name, password);
+				adminService.addAdmin(admin);
+			}
 		}
-		
+
 		HashMap<String,String> response = new HashMap<>();
 		response.put("code", "ok");
-	return response;
+		return response;
 	}
-	
-	
-	
+
+
+
 	@RequestMapping(value="/favoris/get",method = RequestMethod.POST)
 	@ResponseBody
 	public List<Favoris> getFavoris(@RequestParam String name, @RequestParam String password )
@@ -69,71 +72,71 @@ public class Controller {
 		{
 			return loggedAdmin.getFav();
 		}
-		
+
 		return new ArrayList<>();
-		
+
 	}
-	
+
 	@RequestMapping(value="/favoris/add",method = RequestMethod.POST)
 	@ResponseBody
 	public HashMap<String,String> addFavoris(@RequestParam String name, @RequestParam String password, @RequestParam String title, @RequestParam("profile_id_list") ArrayList<String> profileIdList )
 	{
-		
+
 		Admin loggedAdmin = adminService.login(name, password);
-		
+
 		Favoris favToAdd=null;
-		
+
 		if(loggedAdmin != null)
 		{
 			List<Favoris> favMap = loggedAdmin.getFav();
-			
+
 			if(favMap != null)
 			{
-				
+
 				System.out.println("SIZE: "+favMap.size());
-				
+
 				if(favMap.contains(new Favoris(title)))
 				{
 					favToAdd = favMap.get(favMap.indexOf(new Favoris(title)));
 					System.out.println("Editing: "+favToAdd.getTitle()+", SIZE: "+favToAdd.getFavList().size()+", ID: "+favToAdd.getId());
 					List<XingProfile> profiles = favToAdd.getFavList();
-					
+
 					if(profiles == null)
 						profiles = new ArrayList<>();
-					
+
 					List<XingProfile> xingProfilesToAdd = new ArrayList<>();
-					
+
 					for(String profileIdToAdd : profileIdList)
 					{
 						XingProfile xingProfileToAdd = xingService.findByProfileId(profileIdToAdd);
 						if(xingProfileToAdd!=null)
 							xingProfilesToAdd.add(xingProfileToAdd);
 					}
-					
-					
-					
+
+
+
 					profiles.addAll(xingProfilesToAdd);
-					
+
 					Set<XingProfile> profilesNoDuplicate = new HashSet<>();
 					profilesNoDuplicate.addAll(profiles);
-					
-					
+
+
 					favToAdd.setFavList(new ArrayList<XingProfile>(profilesNoDuplicate));
-					
+
 				}
 				else
 				{
-					
+
 					ArrayList<XingProfile> profiles = new ArrayList<>();
 					for(String profileId : profileIdList)
 					{
 						XingProfile profile = xingService.findByProfileId(profileId);
 						if(profile != null)
 						{
-							
+
 							profiles.add(profile);
 						}
-						
+
 					}
 					favToAdd = new Favoris(title, profiles);
 					System.out.println("ADD fav: "+favToAdd.toString());
@@ -144,7 +147,7 @@ public class Controller {
 			else
 			{
 				favMap = new ArrayList();
-				
+
 				ArrayList<XingProfile> profiles = new ArrayList<>();
 				for(String profileId : profileIdList)
 				{
@@ -153,49 +156,49 @@ public class Controller {
 					{
 						profiles.add(profile);
 					}
-					
+
 				}
-				
+
 				favToAdd = new Favoris(title, profiles);
 				favMap.add(favToAdd);
 				loggedAdmin.setFav(favMap);
 			}
-			
+
 			adminService.addAdmin(favToAdd,loggedAdmin);
-			
-			
-			
-			
+
+
+
+
 		}
-		
+
 		HashMap<String,String> response = new HashMap<>();
 		response.put("code", "ok");
-	return response;
+		return response;
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 	@RequestMapping(value = "/profiles/{profile_id}", method = RequestMethod.GET)
 	public XingProfile profileById(@PathVariable("profile_id")String profileId)
 	{
-		
+
 		return xingService.findByProfileId(profileId);
 	}
-	
+
 	@RequestMapping(value="/profiles/{profile_id}/contacts")
 	public Contacts contactsByProfileId(@PathVariable("profile_id") String profileId)
 	{
 		return xingService.contactsByProfileId(profileId);
 	}
-	
+
 	@RequestMapping(value="/profiles/tag/{profiles_tag}")
 	public List<XingProfile> profilesByTag(@PathVariable("profiles_tag")String tag)
 	{
 		return xingService.profilesByTag();
 	}
-	
-	
-	
+
+
+
 }
