@@ -79,7 +79,7 @@ public class Controller {
 
 	@RequestMapping(value="/favoris/add",method = RequestMethod.POST)
 	@ResponseBody
-	public HashMap<String,String> addFavoris(@RequestParam String name, @RequestParam String password, @RequestParam String title, @RequestParam("profile_id_list") ArrayList<String> profileIdList )
+	public HashMap<String,String> addFavoris(@RequestParam String name, @RequestParam String password, @RequestParam String title, @RequestParam("profile_id_list") List<String> profileIdList )
 	{
 
 		Admin loggedAdmin = adminService.login(name, password);
