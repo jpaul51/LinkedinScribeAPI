@@ -211,7 +211,8 @@ public class Controller {
 	@RequestMapping(value="/profiles/tag/{profiles_tag}")
 	public List<XingProfile> profilesByTag(@PathVariable("profiles_tag")String tag)
 	{
-		return xingService.profilesByTag();
+		System.out.println(tag);
+		return xingService.profilesByTag(tag);
 	}
 
 

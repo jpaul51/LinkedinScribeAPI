@@ -188,9 +188,9 @@ public class XingService {
 		return xingRepo.findContactsByProfileId(profileId).getContacts();
 	}
 	
-	public List<XingProfile> profilesByTag()
+	public List<XingProfile> profilesByTag(String tag)
 	{
-		return (List<XingProfile>) xingRepo.findAll();
+		return (List<XingProfile>) xingRepo.findProfilesByTag("%"+tag+"%");
 	}
 	
 	
