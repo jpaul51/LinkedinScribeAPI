@@ -76,6 +76,21 @@ public class Controller {
 		return new ArrayList<>();
 
 	}
+	
+	
+	@RequestMapping(value="/favoris/{title}/remove/{profile_id}",method = RequestMethod.POST)
+	@ResponseBody
+	public HashMap<String,String> removeFavoris(@RequestParam String name, @RequestParam String password, @PathVariable("title") String title, @PathVariable("profile_id") String profileId )
+	{
+		XingProfile profileToEdit = xingService.findByProfileId(profileId);
+		System.out.println(name+", "+password);
+		Admin admin = adminService.login(name, password);
+		System.out.println(admin.getFav().size());
+		return adminService.removeFavoris(profileToEdit, admin, title);
+		
+		
+	}
+	
 
 	@RequestMapping(value="/favoris/add",method = RequestMethod.POST)
 	@ResponseBody
@@ -178,7 +193,7 @@ public class Controller {
 
 
 
-
+	
 
 	@RequestMapping(value = "/profiles/{profile_id}", method = RequestMethod.GET)
 	public XingProfile profileById(@PathVariable("profile_id")String profileId)

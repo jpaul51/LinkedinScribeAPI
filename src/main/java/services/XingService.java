@@ -42,6 +42,10 @@ public class XingService {
 	@PostConstruct
 	public boolean init(){
 		
+		XingProfile profile = xingRepo.findProfileById("1234");
+		
+		if(profile == null)
+		{
 		XingProfile profile5 = new XingProfile("12345678", "Maxime", "Ducoroy", "http://gmail.com", "maxime.ducoroy@gmail.com", "Maxime Ducoroy");
 		profile5.setBirthDate(new BirthDate(new Long(25),new Long(1996),new Long(12)));
 		profile5.setGender("m");
@@ -61,7 +65,7 @@ public class XingService {
 		
 		
 		
-		XingProfile profile = new XingProfile("1234", "jonas", "paul", "http://google.com", "jonas.paul89@gmail.com", "Jonas Paul");
+		 profile = new XingProfile("1234", "jonas", "paul", "http://google.com", "jonas.paul89@gmail.com", "Jonas Paul");
 		profile.setBirthDate(new BirthDate(new Long(11),new Long(1995),new Long(01)));
 		profile.setGender("m");
 		profile.setHaves("Spring,Android");
@@ -114,6 +118,9 @@ public class XingService {
 		School school2 = new School( "Computer Science", new XingDate("2000-01"), "third grade", "Evil school", new XingDate("2002-01"), "notes?");
 		profile.setEducationalBackground(new EducationalBackground(school2,new ArrayList<>(Arrays.asList("diablos qualification")),new ArrayList<>(Arrays.asList(school2))));
 		profile.setWants("Glory");
+		
+	
+		
 		
 		xingRepo.save(profile);
 		xingRepo.save(profile3);
@@ -168,7 +175,7 @@ public class XingService {
 		xingRepo.save(profile3);
 		xingRepo.save(profile4);
 		xingRepo.save(profile5);
-		
+		}
 		
 		return true;
 	}
