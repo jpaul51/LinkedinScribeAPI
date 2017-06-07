@@ -16,8 +16,11 @@
 package model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -97,8 +100,8 @@ long idLong;
 
     @ElementCollection(fetch = FetchType.LAZY)
 	 @OneToMany(cascade=javax.persistence.CascadeType.ALL)
-	 @Type(type="java.util.List")
-    List<Comments> comments;
+	 @Type(type="java.util.Set")
+    Set<Comments> comments;
 
 
     public XingProfile() {
@@ -124,6 +127,18 @@ long idLong;
     
   
     
+public Comments findCommentsObjectByAdminName(String adminName)
+{
+	Comments commentsObjToReturn = new Comments(adminName, new ArrayList<>());
+	for(Comments commentsObject : comments)
+	{
+		if(commentsObject.getAdminName().equals(adminName))
+		{
+			commentsObjToReturn = commentsObject;
+		}
+	}
+	return commentsObjToReturn;
+}
 
 
 
@@ -131,11 +146,11 @@ long idLong;
 
 
 
-	public List<Comments> getComments() {
+	public Set<Comments> getComments() {
 		return comments;
 	}
 
-	public void setComments(List<Comments> comments) {
+	public void setComments(HashSet<Comments> comments) {
 		this.comments = comments;
 	}
 

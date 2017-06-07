@@ -2,14 +2,14 @@ package model;
 
 import java.util.List;
 
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -23,8 +23,9 @@ public class Comments {
 	public String adminName;
 
 	
-	 @ElementCollection
-	public List<String> commentList;
+	@ElementCollection(fetch = FetchType.LAZY)
+	 @ManyToMany(cascade=javax.persistence.CascadeType.ALL)
+	public List<Comment> commentList;
 	
 	
 	
@@ -32,13 +33,13 @@ public class Comments {
 	public Comments() {
 		super();
 	}
-	public Comments(long id, String adminName, List<String> commentList) {
+	public Comments(long id, String adminName, List<Comment> commentList) {
 		super();
 		this.id = id;
 		this.adminName = adminName;
 		this.commentList = commentList;
 	}
-	public Comments(String adminName, List<String> commentList) {
+	public Comments(String adminName, List<Comment> commentList) {
 		super();
 		this.adminName = adminName;
 		this.commentList = commentList;
@@ -49,7 +50,7 @@ public class Comments {
 	public void setAdminName(String adminName) {
 		this.adminName = adminName;
 	}
-	public List<String> getCommentList() {
+	public List<Comment> getCommentList() {
 		return commentList;
 	}
 	
@@ -60,7 +61,7 @@ public class Comments {
 	public void setId(long id) {
 		this.id = id;
 	}
-	public void setCommentList(List<String> commentList) {
+	public void setCommentList(List<Comment> commentList) {
 		this.commentList = commentList;
 	}
 	

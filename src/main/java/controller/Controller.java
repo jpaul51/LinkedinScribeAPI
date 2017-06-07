@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import model.Admin;
+import model.Comment;
 import model.Comments;
 import model.Contacts;
 import model.Favoris;
@@ -217,59 +219,49 @@ public class Controller {
 	}
 
 
-	@RequestMapping(value="/profiles/{profile_id}/comments/add", method = RequestMethod.POST)
-	public void addComment(@PathVariable("profile_id") String profileId, @RequestParam String comment, @RequestParam String name, @RequestParam String password)
+	
+	
+	
+	@RequestMapping(value="/profiles/comments/add", method = RequestMethod.POST)
+	public HashMap<String,String> addComment(@RequestParam("profile_id") String profileId, @RequestParam String comment, @RequestParam String name, @RequestParam String password)
 	{
 		Admin admin = adminService.login(name, password);
-		
+		HashMap<String,String> returnValue = new HashMap<>();
+		returnValue.put("code", "ko");
 		if(admin != null)
 		{
 			XingProfile profile = xingService.findByProfileId(profileId);
 			if(profile !=null)
 			{
-				List<Comments> comments  =  profile.getComments();
-				if(comments == null)
-				{
-					 comments = new ArrayList<Comments>();
-					 profile.setComments(comments);
-						xingService.updateProfile(profile);	 
-				}
-
-				Comments myAdminComments=null;
-				for(Comments allAdminComments : comments)
-				{
-					if(allAdminComments.getAdminName().equals(name))
-					{
-						myAdminComments = allAdminComments;
-					}
-				}
+				//System.out.println(profile.getComments().size());
+				Comments commentsObject = profile.findCommentsObjectByAdminName(name);
+				Comment commentToAdd = new Comment(comment,DateTime.now());
+				commentsObject.getCommentList().add(commentToAdd);
 				
-				if(myAdminComments == null)
-				{
-					System.out.println("Comment object null");
-					myAdminComments = new Comments(name, new ArrayList<>());
-				}
+				profile.getComments().add(commentsObject);
+				
+				commentService.updateComment(commentToAdd);
+				commentService.updateComments(commentsObject);
+				xingService.updateProfile(profile);
+				
+				returnValue.put("code", "ok");
+				returnValue.put("message", "Comment added to profile "+profile.getId());
+				
+//				System.out.println(profile.getComments().size());
+//				System.out.println(profile.getComments().iterator().next().getCommentList().size());
 				
 				
-				myAdminComments.getCommentList().add(comment);
-				commentService.updateComment(myAdminComments);
-				//myAdminComments.getCommentList().add("test");
-				for(String test : myAdminComments.getCommentList())
-				{
-					System.out.println("comments: "+test);
-				}
-				
-				profile.getComments().add(myAdminComments);
-				System.out.println("update");
-				
-				
-			
-				//commentService.updateComment(myAdminComments);
-				
-				
-			
+			}
+			else
+			{
+				returnValue.put("message", "profile "+profileId+" does not exist");
 			}
 		}
+		else
+		{
+			returnValue.put("message", "login failed");
+		}
+		return returnValue;
 		
 	}
 
