@@ -181,7 +181,10 @@ public class XingService {
 	}
 	
 
-	
+	public void updateProfile(XingProfile profile)
+	{
+		xingRepo.save(profile);
+	}
 	
 	public Contacts contactsByProfileId(String profileId)
 	{

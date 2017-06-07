@@ -31,6 +31,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyEnumerated;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
@@ -48,7 +49,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class XingProfile implements Serializable {
 
 @Id
-@GeneratedValue(strategy=GenerationType.IDENTITY)
+@GeneratedValue(strategy=GenerationType.AUTO)
 @Column(name="profileGeneratedId")
 long idLong;
     private static final long serialVersionUID = 6579398072819111682L;
@@ -94,6 +95,10 @@ long idLong;
     @JsonIgnore
     private Contacts contacts;
 
+    @ElementCollection(fetch = FetchType.LAZY)
+	 @OneToMany(cascade=javax.persistence.CascadeType.ALL)
+	 @Type(type="java.util.List")
+    List<Comments> comments;
 
 
     public XingProfile() {
@@ -116,7 +121,25 @@ long idLong;
     }
 
     
-    public long getIdLong() {
+    
+  
+    
+
+
+
+	
+
+
+
+	public List<Comments> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<Comments> comments) {
+		this.comments = comments;
+	}
+
+	public long getIdLong() {
 		return idLong;
 	}
 
@@ -335,4 +358,28 @@ long idLong;
     public WebProfiles getWebProfiles() {
         return webProfiles;
     }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (idLong ^ (idLong >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		XingProfile other = (XingProfile) obj;
+		if (idLong != other.idLong)
+			return false;
+		return true;
+	}
+
+
 }

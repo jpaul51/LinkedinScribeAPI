@@ -11,7 +11,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,13 +18,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import model.Admin;
+import model.Comments;
 import model.Contacts;
 import model.Favoris;
 import model.XingProfile;
 import services.AdminService;
+import services.CommentService;
 import services.XingService;
-import web.FavorisBody;
-import web.LoginBody;
 
 @RestController
 @Configuration 
@@ -40,6 +39,8 @@ public class Controller {
 
 	@Autowired
 	AdminService adminService;
+	@Autowired 
+	CommentService commentService;
 
 	@RequestMapping(value="/login",method = RequestMethod.POST)
 	@ResponseBody
@@ -78,9 +79,9 @@ public class Controller {
 	}
 	
 	
-	@RequestMapping(value="/favoris/{title}/remove/{profile_id}",method = RequestMethod.POST)
+	@RequestMapping(value="/favoris/remove/",method = RequestMethod.POST)
 	@ResponseBody
-	public HashMap<String,String> removeFavoris(@RequestParam String name, @RequestParam String password, @PathVariable("title") String title, @PathVariable("profile_id") String profileId )
+	public HashMap<String,String> removeFavoris(@RequestParam String name, @RequestParam String password, @RequestParam("title") String title, @RequestParam("profile_id") String profileId )
 	{
 		XingProfile profileToEdit = xingService.findByProfileId(profileId);
 		System.out.println(name+", "+password);
@@ -216,5 +217,60 @@ public class Controller {
 	}
 
 
+	@RequestMapping(value="/profiles/{profile_id}/comments/add", method = RequestMethod.POST)
+	public void addComment(@PathVariable("profile_id") String profileId, @RequestParam String comment, @RequestParam String name, @RequestParam String password)
+	{
+		Admin admin = adminService.login(name, password);
+		
+		if(admin != null)
+		{
+			XingProfile profile = xingService.findByProfileId(profileId);
+			if(profile !=null)
+			{
+				List<Comments> comments  =  profile.getComments();
+				if(comments == null)
+				{
+					 comments = new ArrayList<Comments>();
+					 profile.setComments(comments);
+						xingService.updateProfile(profile);	 
+				}
+
+				Comments myAdminComments=null;
+				for(Comments allAdminComments : comments)
+				{
+					if(allAdminComments.getAdminName().equals(name))
+					{
+						myAdminComments = allAdminComments;
+					}
+				}
+				
+				if(myAdminComments == null)
+				{
+					System.out.println("Comment object null");
+					myAdminComments = new Comments(name, new ArrayList<>());
+				}
+				
+				
+				myAdminComments.getCommentList().add(comment);
+				commentService.updateComment(myAdminComments);
+				//myAdminComments.getCommentList().add("test");
+				for(String test : myAdminComments.getCommentList())
+				{
+					System.out.println("comments: "+test);
+				}
+				
+				profile.getComments().add(myAdminComments);
+				System.out.println("update");
+				
+				
+			
+				//commentService.updateComment(myAdminComments);
+				
+				
+			
+			}
+		}
+		
+	}
 
 }
