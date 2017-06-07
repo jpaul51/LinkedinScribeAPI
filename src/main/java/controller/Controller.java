@@ -1,10 +1,13 @@
 package controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.mail.internet.InternetAddress;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.Lists;
+
+import it.ozimov.springboot.mail.model.Email;
+import it.ozimov.springboot.mail.model.defaultimpl.DefaultEmail;
+import it.ozimov.springboot.mail.service.EmailService;
 import model.Admin;
 import model.Comment;
 import model.Comments;
@@ -264,5 +272,33 @@ public class Controller {
 		return returnValue;
 		
 	}
+	
+	@RequestMapping(value="/test", method = RequestMethod.GET)
+	public void sendMail(){
+		sendEmailWithoutTemplating();
+	}
+	
+	
+	
+	@Autowired
+	public EmailService emailService;
+
+	public void sendEmailWithoutTemplating(){
+	   Email email = null;
+	try {
+		email = DefaultEmail.builder()
+		        .from(new InternetAddress("contact@jonas-paul.me", "Xing API Support"))
+		        .to(Lists.newArrayList(new InternetAddress("jonas.paul89@gmail.com", "Jonas Paul")))
+		        .subject("Laelius de amicitia")
+		        .body("Firmamentum autem stabilitatis constantiaeque eius, quam in amicitia quaerimus, fides est.")
+		        .encoding("UTF-8").build();
+	} catch (UnsupportedEncodingException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+	   emailService.send(email);
+	}
+	
 
 }

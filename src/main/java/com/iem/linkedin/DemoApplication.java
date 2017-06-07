@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import controller.Controller;
 import dao.XingRepository;
-import model.XingProfile;
+import it.ozimov.springboot.mail.configuration.EnableEmailTools;
 import services.XingService;
 
 @Configuration
@@ -20,6 +20,7 @@ import services.XingService;
 @ComponentScan({"controller","dao","model","srvices"})
 @ComponentScan(basePackageClasses = { XingService.class,XingRepository.class})
 @EnableJpaRepositories("dao")
+@EnableEmailTools
 public class DemoApplication {
  
 	static String clientId="78o0ctt9334wxc";
@@ -32,6 +33,10 @@ public class DemoApplication {
 		
 		
 	}
+	
+	
+	
+	
 }
 
 
