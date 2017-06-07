@@ -276,6 +276,7 @@ public class Controller {
 	@RequestMapping(value="/test", method = RequestMethod.GET)
 	public void sendMail(){
 		sendEmailWithoutTemplating();
+		
 	}
 	
 	
