@@ -298,7 +298,7 @@ public class Controller {
 		HashMap<String,String> res = new HashMap<>();
 		if(admin != null)
 		{
-			sendEmailWithoutTemplating(admin, "jonas.paul89@gmail.com");
+			sendEmailWithoutTemplating(admin);
 			res.put("code", "ok");
 			res.put("message", "Mail sent");
 		}
@@ -316,7 +316,7 @@ public class Controller {
 	@Autowired
 	public EmailService emailService;
 
-	public void sendEmailWithoutTemplating(Admin admin, String mail){
+	public void sendEmailWithoutTemplating(Admin admin){
 
 
 		XSSFWorkbook workbook = new XSSFWorkbook();
@@ -382,9 +382,9 @@ public class Controller {
 
 			email = DefaultEmail.builder()
 					.from(new InternetAddress("contact@jonas-paul.me", "Xing API Support"))
-					.to(Lists.newArrayList(new InternetAddress(mail, admin.getName())))
-					.subject("Laelius de amicitia")
-					.body("Firmamentum autem stabilitatis constantiaeque eius, quam in amicitia quaerimus, fides est.")
+					.to(Lists.newArrayList(new InternetAddress(admin.getName(), admin.getName())))
+					.subject("Your favorites Xing profiles")
+					.body("You will find your favorites Xing profile in attachement")
 					.attachment(new EmailAttachment() {
 
 						@Override
@@ -423,13 +423,7 @@ public class Controller {
 	}
 
 
-	@RequestMapping(value = "/download", method = RequestMethod.GET)
-	public String download(/*@RequestParam String name, @RequestParam String password,*/ Model model) {
-
-		Admin admin = adminService.login("jonas", "12345");
-		model.addAttribute("users", admin.getFav());
-		return "";
-	}
+	
 
 
 }
