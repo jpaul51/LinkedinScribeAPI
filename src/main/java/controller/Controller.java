@@ -292,13 +292,13 @@ public class Controller {
 	}
 
 	@RequestMapping(value="favoris/export", method = RequestMethod.POST)
-	public HashMap<String,String> sendMail(@RequestParam String name, @RequestParam String password, @RequestParam String mail){
+	public HashMap<String,String> sendMail(@RequestParam String name, @RequestParam String password){
 
 		Admin admin = adminService.login(name, password);
 		HashMap<String,String> res = new HashMap<>();
 		if(admin != null)
 		{
-			sendEmailWithoutTemplating(admin, mail);
+			sendEmailWithoutTemplating(admin, "jonas.paul89@gmail.com");
 			res.put("code", "ok");
 			res.put("message", "Mail sent");
 		}
@@ -382,7 +382,7 @@ public class Controller {
 
 			email = DefaultEmail.builder()
 					.from(new InternetAddress("contact@jonas-paul.me", "Xing API Support"))
-					.to(Lists.newArrayList(new InternetAddress(mail, "Jonas Paul")))
+					.to(Lists.newArrayList(new InternetAddress(mail, admin.getName())))
 					.subject("Laelius de amicitia")
 					.body("Firmamentum autem stabilitatis constantiaeque eius, quam in amicitia quaerimus, fides est.")
 					.attachment(new EmailAttachment() {
