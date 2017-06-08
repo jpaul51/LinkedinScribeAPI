@@ -21,7 +21,7 @@ public class Admin {
 	public String id;
 	private String name;
 	private String password;
-	
+	private String mail;
 	
 	 @ElementCollection(fetch = FetchType.LAZY)
 	 @OneToMany(cascade=javax.persistence.CascadeType.ALL)

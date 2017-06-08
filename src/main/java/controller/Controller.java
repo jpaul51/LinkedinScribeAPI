@@ -17,8 +17,10 @@ import java.util.Set;
 
 import javax.mail.internet.InternetAddress;
 
+import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
@@ -289,13 +291,24 @@ public class Controller {
 
 	}
 
-	@RequestMapping(value="/admin/favoris/get", method = RequestMethod.GET)
-	public void sendMail(@RequestParam String name, @RequestParam String password){
+	@RequestMapping(value="favoris/export", method = RequestMethod.POST)
+	public HashMap<String,String> sendMail(@RequestParam String name, @RequestParam String password, @RequestParam String mail){
 
 		Admin admin = adminService.login(name, password);
+		HashMap<String,String> res = new HashMap<>();
 		if(admin != null)
-			sendEmailWithoutTemplating(admin);
+		{
+			sendEmailWithoutTemplating(admin, mail);
+			res.put("code", "ok");
+			res.put("message", "Mail sent");
+		}
+		else
+		{
+			res.put("code", "KO");
+			res.put("message", "login failed");
+		}
 
+		return res;
 	}
 
 
@@ -303,11 +316,20 @@ public class Controller {
 	@Autowired
 	public EmailService emailService;
 
-	public void sendEmailWithoutTemplating(Admin admin){
+	public void sendEmailWithoutTemplating(Admin admin, String mail){
 
 
 		XSSFWorkbook workbook = new XSSFWorkbook();
 		XSSFSheet sheet = workbook.createSheet("Datatypes in Java");
+
+		XSSFRow header = sheet.createRow(0);
+		header.createCell(0).setCellValue("List name");
+		header.createCell(1).setCellValue("User name");
+		header.createCell(2).setCellValue("mail");
+		header.createCell(3).setCellValue("haves");
+		header.createCell(4).setCellValue("wants");
+		header.createCell(5).setCellValue("comments");
+
 
 		int rowCount = 1;
 		for(Favoris fav : admin.getFav())
@@ -326,21 +348,22 @@ public class Controller {
 				{
 					for(Comment comment : comments.getCommentList())
 					{
-						
+
 						commentCellValue+=comment.getComment()+"\n";
 					}
 				}
 				profileRow.createCell(5).setCellValue(commentCellValue);
-				
-				
+				sheet.autoSizeColumn(rowCount);
+
 			}
+			sheet.autoSizeColumn(rowCount);
 		}
 
 		FileOutputStream outputStream;
 
 		try {
-			
-			 outputStream = new FileOutputStream("tmp/favExport.xls");
+
+			outputStream = new FileOutputStream("tmp/favExport.xls");
 			workbook.write(outputStream);
 			workbook.close();
 		} catch (FileNotFoundException e) {
@@ -356,26 +379,26 @@ public class Controller {
 
 		Email email = null;
 		try {
-			
+
 			email = DefaultEmail.builder()
 					.from(new InternetAddress("contact@jonas-paul.me", "Xing API Support"))
-					.to(Lists.newArrayList(new InternetAddress("jonas.paul89@gmail.com", "Jonas Paul")))
+					.to(Lists.newArrayList(new InternetAddress(mail, "Jonas Paul")))
 					.subject("Laelius de amicitia")
 					.body("Firmamentum autem stabilitatis constantiaeque eius, quam in amicitia quaerimus, fides est.")
 					.attachment(new EmailAttachment() {
-						
+
 						@Override
 						public MediaType getContentType() throws IOException {
 							// TODO Auto-generated method stub
 							return MediaType.APPLICATION_OCTET_STREAM;
 						}
-						
+
 						@Override
 						public String getAttachmentName() {
 							// TODO Auto-generated method stub
 							return "favExport.xls";
 						}
-						
+
 						@Override
 						public byte[] getAttachmentData() {
 							// TODO Auto-generated method stub
