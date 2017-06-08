@@ -33,8 +33,12 @@ import model.XingProfile;
 
 @Service
 public class XingService {
+	
 	@Autowired
 	   XingRepository xingRepo;
+	
+	
+	
 	@Autowired
 	ContactsRepository contactsRepo;
 	

@@ -120,6 +120,29 @@ public class Controller {
 
 	}
 
+	@RequestMapping(value="/favoris/folder/remove",method = RequestMethod.POST)
+	@ResponseBody
+	public HashMap<String,String> removeFavorisFolder(@RequestParam String name, @RequestParam String password, @RequestParam("title") String title )
+	{
+		
+		Admin admin = adminService.login(name, password);
+		
+		Favoris favToDelete = null;
+		for(Favoris fav : admin.getFav())
+		{
+			if(title.equals(fav.getTitle()))
+			{
+				favToDelete = fav;
+			}
+		}
+		
+		adminService.removeFavorisFolder(admin, favToDelete);
+		//return adminService.removeFavoris(profileToEdit, admin, title);
+		return null;
+
+	}
+
+
 
 	@RequestMapping(value="/favoris/add",method = RequestMethod.POST)
 	@ResponseBody
@@ -423,7 +446,7 @@ public class Controller {
 	}
 
 
-	
+
 
 
 }

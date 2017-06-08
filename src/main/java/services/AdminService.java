@@ -46,16 +46,36 @@ public class AdminService {
 
 	}
 
+
+	public HashMap<String,String> removeFavorisFolder(Admin admin, Favoris fav)
+	{
+		HashMap<String,String> ret = new HashMap<>();
+		if(admin == null)
+		{
+			ret.put("code", "KO");
+			ret.put("message", "Login failed");
+		}
+		admin.getFav().remove(fav);
+		adminRepo.save(admin);
+
+		ret.put("code", "OK");
+		ret.put("message", "Folder "+fav.getTitle() + " removed");
+		
+		return ret;
+	}
+
+
+
 	public HashMap<String,String> removeFavoris(XingProfile profileToEdit, Admin admin, String favTitle)
 	{
 		HashMap<String,String> ret = new HashMap<>();
-		
+
 		if(admin.getFav().isEmpty())
 		{
 			ret.put("code", "KO");
 			ret.put("message", "Empty list");
 		}
-		
+
 		boolean titleFound=false;
 		String removedId="";
 		for(Favoris f : admin.getFav())
@@ -69,7 +89,7 @@ public class AdminService {
 				}
 			}
 		}
-		
+
 		if(!titleFound)
 		{
 			ret.put("code", "KO");
@@ -87,7 +107,7 @@ public class AdminService {
 		}
 		adminRepo.save(admin);
 		return ret;
-		
+
 	}
 
 
