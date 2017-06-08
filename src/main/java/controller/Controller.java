@@ -1,6 +1,14 @@
 package controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,11 +17,17 @@ import java.util.Set;
 
 import javax.mail.internet.InternetAddress;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.http.MediaType;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,8 +36,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.Lists;
+import com.sun.mail.iap.ByteArray;
 
 import it.ozimov.springboot.mail.model.Email;
+import it.ozimov.springboot.mail.model.EmailAttachment;
 import it.ozimov.springboot.mail.model.defaultimpl.DefaultEmail;
 import it.ozimov.springboot.mail.service.EmailService;
 import model.Admin;
@@ -87,8 +103,8 @@ public class Controller {
 		return new ArrayList<>();
 
 	}
-	
-	
+
+
 	@RequestMapping(value="/favoris/remove/",method = RequestMethod.POST)
 	@ResponseBody
 	public HashMap<String,String> removeFavoris(@RequestParam String name, @RequestParam String password, @RequestParam("title") String title, @RequestParam("profile_id") String profileId )
@@ -98,10 +114,10 @@ public class Controller {
 		Admin admin = adminService.login(name, password);
 		System.out.println(admin.getFav().size());
 		return adminService.removeFavoris(profileToEdit, admin, title);
-		
-		
+
+
 	}
-	
+
 
 	@RequestMapping(value="/favoris/add",method = RequestMethod.POST)
 	@ResponseBody
@@ -204,7 +220,7 @@ public class Controller {
 
 
 
-	
+
 
 	@RequestMapping(value = "/profiles/{profile_id}", method = RequestMethod.GET)
 	public XingProfile profileById(@PathVariable("profile_id")String profileId)
@@ -227,9 +243,9 @@ public class Controller {
 	}
 
 
-	
-	
-	
+
+
+
 	@RequestMapping(value="/profiles/comments/add", method = RequestMethod.POST)
 	public HashMap<String,String> addComment(@RequestParam("profile_id") String profileId, @RequestParam String comment, @RequestParam String name, @RequestParam String password)
 	{
@@ -245,20 +261,20 @@ public class Controller {
 				Comments commentsObject = profile.findCommentsObjectByAdminName(name);
 				Comment commentToAdd = new Comment(comment,DateTime.now());
 				commentsObject.getCommentList().add(commentToAdd);
-				
+
 				profile.getComments().add(commentsObject);
-				
+
 				commentService.updateComment(commentToAdd);
 				commentService.updateComments(commentsObject);
 				xingService.updateProfile(profile);
-				
+
 				returnValue.put("code", "ok");
 				returnValue.put("message", "Comment added to profile "+profile.getId());
-				
-//				System.out.println(profile.getComments().size());
-//				System.out.println(profile.getComments().iterator().next().getCommentList().size());
-				
-				
+
+				//				System.out.println(profile.getComments().size());
+				//				System.out.println(profile.getComments().iterator().next().getCommentList().size());
+
+
 			}
 			else
 			{
@@ -270,36 +286,127 @@ public class Controller {
 			returnValue.put("message", "login failed");
 		}
 		return returnValue;
-		
+
 	}
-	
-	@RequestMapping(value="/test", method = RequestMethod.GET)
-	public void sendMail(){
-		sendEmailWithoutTemplating();
-		
+
+	@RequestMapping(value="/admin/favoris/get", method = RequestMethod.GET)
+	public void sendMail(@RequestParam String name, @RequestParam String password){
+
+		Admin admin = adminService.login(name, password);
+		if(admin != null)
+			sendEmailWithoutTemplating(admin);
+
 	}
-	
-	
-	
+
+
+
 	@Autowired
 	public EmailService emailService;
 
-	public void sendEmailWithoutTemplating(){
-	   Email email = null;
-	try {
-		email = DefaultEmail.builder()
-		        .from(new InternetAddress("contact@jonas-paul.me", "Xing API Support"))
-		        .to(Lists.newArrayList(new InternetAddress("jonas.paul89@gmail.com", "Jonas Paul")))
-		        .subject("Laelius de amicitia")
-		        .body("Firmamentum autem stabilitatis constantiaeque eius, quam in amicitia quaerimus, fides est.")
-		        .encoding("UTF-8").build();
-	} catch (UnsupportedEncodingException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+	public void sendEmailWithoutTemplating(Admin admin){
+
+
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet("Datatypes in Java");
+
+		int rowCount = 1;
+		for(Favoris fav : admin.getFav())
+		{
+			Row favRow = sheet.createRow(rowCount++);
+			favRow.createCell(0).setCellValue(fav.getTitle());
+			for(XingProfile profile : fav.getFavList())
+			{
+				Row profileRow = sheet.createRow(rowCount++);
+				profileRow.createCell(1).setCellValue(profile.getDisplayName());
+				profileRow.createCell(2).setCellValue(profile.getActiveEmail());
+				profileRow.createCell(3).setCellValue(profile.getHaves());
+				profileRow.createCell(4).setCellValue(profile.getWants());
+				String commentCellValue = "";
+				for(Comments comments : profile.getComments())
+				{
+					for(Comment comment : comments.getCommentList())
+					{
+						
+						commentCellValue+=comment.getComment()+"\n";
+					}
+				}
+				profileRow.createCell(5).setCellValue(commentCellValue);
+				
+				
+			}
+		}
+
+		FileOutputStream outputStream;
+
+		try {
+			
+			 outputStream = new FileOutputStream("tmp/favExport.xls");
+			workbook.write(outputStream);
+			workbook.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("Done");
+
+
+
+
+		Email email = null;
+		try {
+			
+			email = DefaultEmail.builder()
+					.from(new InternetAddress("contact@jonas-paul.me", "Xing API Support"))
+					.to(Lists.newArrayList(new InternetAddress("jonas.paul89@gmail.com", "Jonas Paul")))
+					.subject("Laelius de amicitia")
+					.body("Firmamentum autem stabilitatis constantiaeque eius, quam in amicitia quaerimus, fides est.")
+					.attachment(new EmailAttachment() {
+						
+						@Override
+						public MediaType getContentType() throws IOException {
+							// TODO Auto-generated method stub
+							return MediaType.APPLICATION_OCTET_STREAM;
+						}
+						
+						@Override
+						public String getAttachmentName() {
+							// TODO Auto-generated method stub
+							return "favExport.xls";
+						}
+						
+						@Override
+						public byte[] getAttachmentData() {
+							// TODO Auto-generated method stub
+							Path path =FileSystems.getDefault().getPath("tmp/favExport.xls");
+							byte[] bytes = null;
+							try {
+								bytes = Files.readAllBytes(path);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							return bytes;
+						}
+					})
+					.encoding("UTF-8").build();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		emailService.send(email);
 	}
 
-	   emailService.send(email);
+
+	@RequestMapping(value = "/download", method = RequestMethod.GET)
+	public String download(/*@RequestParam String name, @RequestParam String password,*/ Model model) {
+
+		Admin admin = adminService.login("jonas", "12345");
+		model.addAttribute("users", admin.getFav());
+		return "";
 	}
-	
+
 
 }
